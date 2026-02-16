@@ -1,12 +1,10 @@
-// ATENÇÃO: Verifique se no seu lib/firebase.js você exportou getApprovedPendingGuests corretamente
 const {
   getApprovedPendingGuests,
   markGuestAsNotified,
 } = require("../lib/firebase");
 
-// DADOS DO EVENTO
 const EVENT_INFO = {
-  date: "20/12/2026",
+  date: "09/05/2026",
   time: "16:00",
   location: "Espaço Garden - Rua das Flores, 123, Sorocaba - SP",
   mapLink: "https://goo.gl/maps/SEU_LINK_AQUI",
@@ -24,12 +22,17 @@ const sendEmail = async (emailData) => {
       body: JSON.stringify(emailData),
     });
 
-    // Brevo retorna 201 ou 200 se der certo
     return response.ok;
   } catch (error) {
     console.error("Erro ao enviar email:", error.message);
     return false;
   }
+};
+
+const parseDate = (dateVal) => {
+  if (!dateVal) return null;
+  if (typeof dateVal.toDate === "function") return dateVal.toDate();
+  return new Date(dateVal);
 };
 
 const runEmailJob = async (req, res) => {
@@ -40,7 +43,6 @@ const runEmailJob = async (req, res) => {
   }
 
   try {
-    // Busca APENAS aprovados pendentes de email
     const guests = await getApprovedPendingGuests();
 
     if (guests.length === 0) {
@@ -51,29 +53,37 @@ const runEmailJob = async (req, res) => {
 
     const now = new Date();
     const results = [];
+    const DELAY_MINUTES = 1440; // 24 Horas
 
     for (const guest of guests) {
-      // --- LÓGICA DOS 15 MINUTOS ---
       if (guest.approvedAt) {
-        const approvedTime = new Date(guest.approvedAt);
+        const approvedTime = parseDate(guest.approvedAt);
+
+        if (!approvedTime || isNaN(approvedTime.getTime())) {
+          console.error(
+            `[ERRO] Data inválida para ${guest.email}:`,
+            guest.approvedAt
+          );
+          results.push({ email: guest.email, status: "erro_data_invalida" });
+          continue;
+        }
+
         const diffMinutes = (now - approvedTime) / 1000 / 60;
 
-        // Se passou menos de 15 minutos, PULA este convidado
-        if (diffMinutes < 15) {
+        if (diffMinutes < DELAY_MINUTES) {
           console.log(
             `⏳ ${guest.name}: Aguardando tempo (${Math.floor(
               diffMinutes
-            )} min)`
+            )}/${DELAY_MINUTES} min)`
           );
-          results.push({ email: guest.email, status: "aguardando_15min" });
+          results.push({ email: guest.email, status: "aguardando_24h" });
           continue;
         }
       } else {
-        // Se não tem approvedAt, ignoramos para segurança
         continue;
       }
 
-      // --- CONTEÚDO DO EMAIL ---
+      // --- EMAIL ---
       const htmlContent = `
                 <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
                     <div style="background-color: #f8f8f8; padding: 20px; text-align: center;">

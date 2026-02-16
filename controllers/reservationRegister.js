@@ -13,15 +13,14 @@ const confirmPresence = async (req, res) => {
         .json({ message: "Este email já confirmou presença." });
     }
 
-    // Salva com status 'pending' e sem notificação
     await saveConfirmation({
       name,
       email,
       whatsapp,
       guestCount,
       message,
-      status: "pending", // Importante para o painel Admin
-      emailSent: false, // Importante para o Job
+      status: "pending",
+      emailSent: false,
       createdAt: new Date().toISOString(),
     });
 
