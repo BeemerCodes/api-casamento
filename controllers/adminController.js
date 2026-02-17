@@ -6,8 +6,17 @@ const {
 const EVENT_INFO = {
   date: "09/05/2026",
   time: "16:00",
-  location: "Espaço Garden - Rua das Flores, 123, Sorocaba - SP",
-  mapLink: "https://goo.gl/maps/SEU_LINK_AQUI",
+  church: {
+    name: "Cerimônia Religiosa",
+    address:
+      "Praça Cel. Joaquim Estanislau de Arruda, 198 - Vila Mencacci, Sorocaba - SP, 18090-190",
+    mapLink: "https://maps.app.goo.gl/5rLTV3ya9oQpxzju6",
+  },
+  party: {
+    name: "Recepção e Festa",
+    address: "R. Angelino Roque, 96, Sorocaba - SP, 18105-120",
+    mapLink: "https://goo.gl/maps/2br7L2wLLQP2",
+  },
 };
 
 const sendEmail = async (emailData) => {
@@ -53,7 +62,7 @@ const runEmailJob = async (req, res) => {
 
     const now = new Date();
     const results = [];
-    const DELAY_MINUTES = 1440; // 24 Horas
+    const DELAY_MINUTES = 1440;
 
     for (const guest of guests) {
       if (guest.approvedAt) {
@@ -85,31 +94,48 @@ const runEmailJob = async (req, res) => {
 
       // --- EMAIL ---
       const htmlContent = `
-                <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
-                    <div style="background-color: #f8f8f8; padding: 20px; text-align: center;">
-                        <h2 style="color: #d97706; margin:0;">Presença Confirmada! 🎉</h2>
-                    </div>
-                    <div style="padding: 20px;">
-                        <p>Olá, <strong>${guest.name}</strong>!</p>
-                        <p>Ficamos felizes em confirmar sua presença! Aqui estão os detalhes:</p>
-                        
-                        <div style="background-color: #fffaf0; border-left: 4px solid #d97706; padding: 15px; margin: 20px 0;">
-                            <p><strong>📅 Data:</strong> ${EVENT_INFO.date}</p>
-                            <p><strong>⏰ Horário:</strong> ${EVENT_INFO.time}</p>
-                            <p><strong>📍 Local:</strong> ${EVENT_INFO.location}</p>
-                        </div>
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+            
+            <div style="background-color: #fff8f0; padding: 30px 20px; text-align: center; border-bottom: 3px solid #d97706;">
+                <h2 style="color: #d97706; margin: 0; font-size: 24px;">Presença Confirmada! 🎉</h2>
+                <p style="color: #78350f; margin-top: 10px; font-size: 16px;">Estamos muito felizes em ter você conosco!</p>
+            </div>
 
-                        <div style="text-align: center; margin-top: 30px;">
-                            <a href="${EVENT_INFO.mapLink}" style="background-color: #333; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">Ver no Mapa</a>
-                        </div>
-                    </div>
+            <div style="padding: 30px 25px;">
+                <p style="font-size: 16px; margin-bottom: 25px;">Olá, <strong>${guest.name}</strong>!</p>
+                <p style="margin-bottom: 25px; line-height: 1.5;">Sua presença foi confirmada com sucesso. Abaixo estão todos os detalhes para o grande dia:</p>
+                
+                <div style="text-align: center; margin-bottom: 30px; padding: 15px; background-color: #f9fafb; border-radius: 8px;">
+                    <p style="margin: 5px 0; font-size: 18px;"><strong>📅 ${EVENT_INFO.date}</strong></p>
+                    <p style="margin: 5px 0; font-size: 18px;"><strong>⏰ às ${EVENT_INFO.time}</strong></p>
                 </div>
-            `;
+
+                <div style="margin-bottom: 25px; border-left: 4px solid #d97706; padding-left: 15px;">
+                    <h3 style="margin: 0 0 5px 0; color: #d97706;">💒 ${EVENT_INFO.church.name}</h3>
+                    <p style="margin: 0 0 10px 0; color: #555; font-size: 14px;">${EVENT_INFO.church.address}</p>
+                    <a href="${EVENT_INFO.church.mapLink}" style="display: inline-block; text-decoration: none; color: #0369a1; font-weight: bold; font-size: 14px;">📍 Ver Igreja no Mapa &rarr;</a>
+                </div>
+
+                <div style="margin-bottom: 25px; border-left: 4px solid #d97706; padding-left: 15px;">
+                    <h3 style="margin: 0 0 5px 0; color: #d97706;">🥂 ${EVENT_INFO.party.name}</h3>
+                    <p style="margin: 0 0 10px 0; color: #555; font-size: 14px;">${EVENT_INFO.party.address}</p>
+                    <a href="${EVENT_INFO.party.mapLink}" style="display: inline-block; text-decoration: none; color: #0369a1; font-weight: bold; font-size: 14px;">📍 Ver Festa no Mapa &rarr;</a>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+                
+                <p style="text-align: center; color: #999; font-size: 12px;">
+                   Dúvidas? Entre em contato pelo nosso site.<br>
+                   Esperamos você lá! ❤️
+                </p>
+            </div>
+        </div>
+      `;
 
       const sent = await sendEmail({
         sender: { name: "Casamento Veronica", email: process.env.EMAIL_SENDER },
         to: [{ email: guest.email, name: guest.name }],
-        subject: "Sua presença foi confirmada! Veja os detalhes.",
+        subject: "Sua presença foi confirmada! Veja os endereços.",
         htmlContent: htmlContent,
       });
 
