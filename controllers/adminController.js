@@ -94,48 +94,110 @@ const runEmailJob = async (req, res) => {
 
       // --- EMAIL ---
       const htmlContent = `
-        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            .btn-map {
+              display: inline-block;
+              background-color: #d97706;
+              color: #ffffff !important;
+              text-decoration: none;
+              padding: 10px 20px;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: bold;
+              text-align: center;
+              border: 1px solid #b45309;
+            }
+            .card-location {
+              background-color: #ffffff;
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              padding: 20px;
+              margin-bottom: 20px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            }
+            .highlight-date {
+                background-color: #fffbeb;
+                border: 1px dashed #d97706;
+                border-radius: 8px;
+                padding: 15px;
+                margin: 25px 0;
+                text-align: center;
+            }
+          </style>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
             
-            <div style="background-color: #fff8f0; padding: 30px 20px; text-align: center; border-bottom: 3px solid #d97706;">
-                <h2 style="color: #d97706; margin: 0; font-size: 24px;">Presença Confirmada! 🎉</h2>
-                <p style="color: #78350f; margin-top: 10px; font-size: 16px;">Estamos muito felizes em ter você conosco!</p>
-            </div>
-
-            <div style="padding: 30px 25px;">
-                <p style="font-size: 16px; margin-bottom: 25px;">Olá, <strong>${guest.name}</strong>!</p>
-                <p style="margin-bottom: 25px; line-height: 1.5;">Sua presença foi confirmada com sucesso. Abaixo estão todos os detalhes para o grande dia:</p>
+            <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);">
                 
-                <div style="text-align: center; margin-bottom: 30px; padding: 15px; background-color: #f9fafb; border-radius: 8px;">
-                    <p style="margin: 5px 0; font-size: 18px;"><strong>📅 ${EVENT_INFO.date}</strong></p>
-                    <p style="margin: 5px 0; font-size: 18px;"><strong>⏰ às ${EVENT_INFO.time}</strong></p>
+                <div style="padding: 40px 20px 20px 20px; text-align: center; background-color: #ffffff;">
+                    <h1 style="color: #d97706; margin: 0; font-size: 32px; font-weight: normal; font-family: 'Times New Roman', serif;">Presença Confirmada! 🎉</h1>
+                    <div style="width: 50px; height: 2px; background-color: #d97706; margin: 15px auto 0 auto;"></div>
                 </div>
 
-                <div style="margin-bottom: 25px; border-left: 4px solid #d97706; padding-left: 15px;">
-                    <h3 style="margin: 0 0 5px 0; color: #d97706;">💒 ${EVENT_INFO.church.name}</h3>
-                    <p style="margin: 0 0 10px 0; color: #555; font-size: 14px;">${EVENT_INFO.church.address}</p>
-                    <a href="${EVENT_INFO.church.mapLink}" style="display: inline-block; text-decoration: none; color: #0369a1; font-weight: bold; font-size: 14px;">📍 Ver Igreja no Mapa &rarr;</a>
-                </div>
+                <div style="padding: 20px 40px 40px 40px;">
+                    <p style="color: #4b5563; font-size: 16px; text-align: center; margin-bottom: 10px; line-height: 1.6;">
+                        Olá, <strong>${guest.name}</strong>!
+                    </p>
+                    <p style="color: #6b7280; font-size: 15px; text-align: center; margin-top: 0;">
+                        Estamos contando os dias para celebrar com você.
+                    </p>
 
-                <div style="margin-bottom: 25px; border-left: 4px solid #d97706; padding-left: 15px;">
-                    <h3 style="margin: 0 0 5px 0; color: #d97706;">🥂 ${EVENT_INFO.party.name}</h3>
-                    <p style="margin: 0 0 10px 0; color: #555; font-size: 14px;">${EVENT_INFO.party.address}</p>
-                    <a href="${EVENT_INFO.party.mapLink}" style="display: inline-block; text-decoration: none; color: #0369a1; font-weight: bold; font-size: 14px;">📍 Ver Festa no Mapa &rarr;</a>
-                </div>
+                    <div class="highlight-date">
+                        <p style="font-size: 22px; color: #92400e; font-weight: bold; margin: 0;">${EVENT_INFO.date}</p>
+                        <p style="font-size: 16px; color: #b45309; margin: 5px 0 0 0;">às ${EVENT_INFO.time}</p>
+                    </div>
 
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
-                
-                <p style="text-align: center; color: #999; font-size: 12px;">
-                   Dúvidas? Entre em contato pelo nosso site.<br>
-                   Esperamos você lá! ❤️
-                </p>
+                    <div class="card-location">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <h3 style="color: #92400e; margin-top: 0; margin-bottom: 5px; font-size: 18px;">💒 Cerimônia</h3>
+                                <p style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0 0 15px 0;">
+                                    <strong>${EVENT_INFO.church.name}</strong><br>
+                                    ${EVENT_INFO.church.address}
+                                </p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                             <a href="${EVENT_INFO.church.mapLink}" class="btn-map">Ver no Mapa →</a>
+                        </div>
+                    </div>
+
+                    <div class="card-location">
+                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <h3 style="color: #92400e; margin-top: 0; margin-bottom: 5px; font-size: 18px;">🥂 Recepção</h3>
+                                <p style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0 0 15px 0;">
+                                    <strong>${EVENT_INFO.party.name}</strong><br>
+                                    ${EVENT_INFO.party.address}
+                                </p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                             <a href="${EVENT_INFO.party.mapLink}" class="btn-map">Ver no Mapa →</a>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 40px; border-top: 1px solid #f3f4f6; padding-top: 20px;">
+                        <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                            Com carinho,<br>
+                            <span style="color: #d97706; font-weight: bold;">Verônica & Vinicius</span>
+                        </p>
+                    </div>
+                </div>
             </div>
-        </div>
+            
+            <div style="height: 40px;"></div>
+        </body>
+        </html>
       `;
 
       const sent = await sendEmail({
         sender: { name: "Casamento Veronica", email: process.env.EMAIL_SENDER },
         to: [{ email: guest.email, name: guest.name }],
-        subject: "Sua presença foi confirmada! Veja os endereços.",
+        subject: "Sua presença foi confirmada! 💍",
         htmlContent: htmlContent,
       });
 
