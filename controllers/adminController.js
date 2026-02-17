@@ -195,7 +195,7 @@ const runEmailJob = async (req, res) => {
       `;
 
       const sent = await sendEmail({
-        sender: { name: "Casamento Veronica", email: process.env.EMAIL_SENDER },
+        sender: { name: "Casamento - V&V", email: process.env.EMAIL_SENDER },
         to: [{ email: guest.email, name: guest.name }],
         subject: "Sua presença foi confirmada! 💍",
         htmlContent: htmlContent,
